@@ -1,15 +1,6 @@
 """
 YOLO Object Detection on OBS Virtual Camera Feed
 
-This script captures video from an OBS virtual camera and runs YOLO object detection
-in real-time, displaying the results with bounding boxes.
-
-Requirements:
-    - ultralytics (YOLOv8)
-    - opencv-python
-    - numpy
-
-Install with: pip install ultralytics opencv-python numpy
 """
 
 import cv2
@@ -20,15 +11,12 @@ import sys
 
 def main(camera_index=0):
     """
-    Main function to run YOLO detection on OBS virtual camera feed.
-    
     Args:
-        camera_index: Camera device index to use (default: 0)
+        camera_index: (default: 0)
     """
     
     # Load the YOLOv8 model (nano for speed, can use small, medium, large, or xlarge)
     # First run will download the model (~250MB for nano)
-    print("Loading YOLOv8 model...")
     model = YOLO("yolov8n.pt")  # nano model (fastest)
     # model = YOLO("yolov8s.pt")  # small model (balanced)
     # model = YOLO("yolov8m.pt")  # medium model (more accurate)
@@ -36,14 +24,12 @@ def main(camera_index=0):
     # Open the OBS Virtual Camera
     # Usually camera index 0 is the default camera, but OBS virtual camera might be 1, 2, etc.
     # Try different indices if 0 doesn't work
-    print(f"Opening camera at index {camera_index}...")
+    print(f"Camera index: {camera_index}...")
     
     cap = cv2.VideoCapture(camera_index)
     
     if not cap.isOpened():
-        print(f"Error: Could not open camera at index {camera_index}")
-        print("Try running: python yolo_obs_camera.py <camera_index>")
-        print("Common indices: 0 (default), 1, 2, etc.")
+        print(f"Error")
         sys.exit(1)
     
     # Set camera properties for better performance
@@ -51,8 +37,8 @@ def main(camera_index=0):
     cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
     cap.set(cv2.CAP_PROP_FPS, 30)
     
-    print("Camera opened successfully. Starting detection...")
-    print("Press 'q' to quit, 's' to save frame")
+   
+    print("Press 'q' to quit")
     
     frame_count = 0
     
@@ -91,10 +77,6 @@ def main(camera_index=0):
             if key == ord('q'):
                 print("Exiting...")
                 break
-            elif key == ord('s'):
-                filename = f"detection_frame_{frame_count}.jpg"
-                cv2.imwrite(filename, annotated_frame)
-                print(f"Frame saved as {filename}")
     
     except KeyboardInterrupt:
         print("\nInterrupted by user")
@@ -103,7 +85,7 @@ def main(camera_index=0):
         # Cleanup
         cap.release()
         cv2.destroyAllWindows()
-        print("Camera released. Program terminated.")
+        print("Terminated.")
 
 
 if __name__ == "__main__":
@@ -113,7 +95,7 @@ if __name__ == "__main__":
         try:
             camera_index = int(sys.argv[1])
         except ValueError:
-            print(f"Error: Camera index must be a number, got '{sys.argv[1]}'")
+            print(f"Value Error: Camera index must be a number, got '{sys.argv[1]}'")
             sys.exit(1)
     
     main(camera_index)
