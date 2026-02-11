@@ -9,10 +9,11 @@ from ultralytics import YOLO
 import sys
 
 
-def main(camera_index=0):
+def main(camera_index=5):
     """
     Args:
         camera_index: (default: 0)
+        but generally obs feed at 5
     """
     
     # Load the YOLOv8 model (nano for speed, can use small, medium, large, or xlarge)
@@ -22,9 +23,7 @@ def main(camera_index=0):
     # model = YOLO("yolov8m.pt")  # medium model (more accurate)
     
     # Open the OBS Virtual Camera
-    # Usually camera index 0 is the default camera, but OBS virtual camera might be 1, 2, etc.
-    # Try different indices if 0 doesn't work
-    print(f"Camera index: {camera_index}...")
+    print(f"Camera index: {camera_index}")
     
     cap = cv2.VideoCapture(camera_index)
     
@@ -40,8 +39,6 @@ def main(camera_index=0):
    
     print("Press 'q' to quit")
     
-    frame_count = 0
-    
     try:
         while True:
             ret, frame = cap.read()
@@ -56,25 +53,12 @@ def main(camera_index=0):
             # Render results on the frame (adds bounding boxes, labels, confidence scores)
             annotated_frame = results[0].plot()
             
-            frame_count += 1
-            
-            # Add frame counter and FPS information
-            cv2.putText(
-                annotated_frame,
-                f"Frame: {frame_count}",
-                (10, 30),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                0.7,
-                (0, 255, 0),
-                2
-            )
-            
             # Display the frame with detections
             cv2.imshow("YOLO Detection - OBS Virtual Camera", annotated_frame)
             
             # Handle keyboard input
             key = cv2.waitKey(1) & 0xFF
-            if key == ord('q'):
+            if key == ord('q')
                 print("Exiting...")
                 break
     
@@ -95,7 +79,7 @@ if __name__ == "__main__":
         try:
             camera_index = int(sys.argv[1])
         except ValueError:
-            print(f"Value Error: Camera index must be a number, got '{sys.argv[1]}'")
+            print(f"Value Error: Camera index must be a number")
             sys.exit(1)
     
     main(camera_index)
