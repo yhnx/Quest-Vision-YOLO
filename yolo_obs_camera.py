@@ -58,7 +58,7 @@ def main(camera_index=5):
             
             # Handle keyboard input
             key = cv2.waitKey(1) & 0xFF
-            if key == ord('q')
+            if key == ord('q'):
                 print("Exiting...")
                 break
     
