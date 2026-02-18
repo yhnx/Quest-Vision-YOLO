@@ -51,44 +51,39 @@ python yolo_obs_camera.py 2
 While the program is running:
 
 - **Press 'q'**: Quit the program
-- **Press 's'**: Save the current frame with detections to a JPEG file
+
 - The program displays real-time detection results with bounding boxes
 
 ## How It Works
-
+    
 ### Script Overview
 
 The `yolo_obs_camera.py` script performs these operations:
 
-1. **Load YOLOv8 Model**: Initializes a pre-trained YOLOv8 model
-   - `yolov8n.pt` (nano): Fastest, ~250MB, good for real-time
-   - `yolov8s.pt` (small): Balanced speed/accuracy
-   - `yolov8m.pt` (medium): Better accuracy, slower
-   - `yolov8l.pt` (large): High accuracy, slower
+1. **Load YOLOv8 Model**: Initializes a pre-trained YOLOv8 model (default `yolov8n.pt`).
+2. **Open Camera**: Connects to the OBS virtual camera using OpenCV.
+3. **Object Tracking**: Uses a `SpeedTracker` class to track objects across frames based on centroid distance.
+4. **Speed Estimation**: Calculates the pixel speed of tracked objects.
+5. **Visualization**: Draws bounding boxes and speed labels on the frame (classification labels are hidden).
 
-2. **Open Camera**: Connects to the OBS virtual camera using OpenCV
+### Modular Design
 
-3. **Main Loop**: For each video frame:
-   - Captures frame from camera
-   - Runs YOLO inference (object detection)
-   - Draws bounding boxes and labels on the frame
-   - Displays the annotated frame
-   - Listens for keyboard commands
+The code is structured for modularity:
 
-4. **Cleanup**: Properly releases camera resources when done
+- **`SpeedTracker` Class**: A reusable class that handles object tracking and speed calculation. Can be easily imported into other projects.
+- **`run_tracker` Function**: The main driver function that handles camera setup and the processing loop.
 
 ### Key Parameters
 
 In `yolo_obs_camera.py`:
 
 ```python
-model = YOLO("yolov8n.pt")  # Change model size here
-results = model(frame, conf=0.5, verbose=False)  # conf=0.5 is confidence threshold
+# Initialize Tracker with specific FPS
+tracker = SpeedTracker(fps=30.0, max_distance=100)
 ```
 
-- **conf=0.5**: Only show detections with >50% confidence (adjust 0.0-1.0)
-- Lower confidence = more detections (including false positives)
-- Higher confidence = fewer detections (only high-confidence ones)
+- **`fps`**: The frames per second used for speed calculations. The script attempts to read this from the camera, but defaults to 30.0 if unavailable.
+- **`max_distance`**: Maximum pixel distance to consider an object the same between frames.
 
 ## Troubleshooting
 
@@ -119,35 +114,9 @@ results = model(frame, conf=0.5, verbose=False)  # conf=0.5 is confidence thresh
 | YOLOv8m (medium) | Moderate  | Very Good | ~610MB |
 | YOLOv8l (large)  | Slow      | Excellent | ~940MB |
 
-## Advanced Usage
-
-### Custom Detection Classes
-
-Modify the script to only detect specific object classes:
-
-```python
-# In main loop, after getting results:
-for r in results:
-    for box in r.boxes:
-        cls = int(box.cls)
-        if cls in [0, 1, 2]:  # Only person, bicycle, car
-            # Process this detection
-```
-
-### Change Confidence Threshold
-
-```python
-results = model(frame, conf=0.3)  # Lower = more detections
-results = model(frame, conf=0.7)  # Higher = fewer, more confident detections
-```
-
-### Record Output Video
-
-See `yolo_obs_camera_record.py` for video recording capability.
-
 ## Files
 
-- `yolo_obs_camera.py`: Main script for real-time detection
+- `yolo_obs_camera.py`: Main script for real-time detection and tracking
 - `find_cameras.py`: Helper script to identify available cameras
 - `requirements.txt`: Python package dependencies
 - `README.md`: This file
